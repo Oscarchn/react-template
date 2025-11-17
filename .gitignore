@@ -12,6 +12,10 @@ pnpm-lock.yaml
 
 # production
 /build
+/dist
+
+# external nested repos or local plugins
+/external/
 
 # misc
 .DS_Store

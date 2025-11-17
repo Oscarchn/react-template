@@ -1,6 +1,6 @@
 import './App.css';
 import { bitable, ITableMeta } from "@lark-base-open/js-sdk";
-import { Button, Form } from '@douyinfe/semi-ui';
+import { Button, Form, Typography } from '@douyinfe/semi-ui';
 import { BaseFormApi } from '@douyinfe/semi-foundation/lib/es/form/interface';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { TaskList } from './components/TaskList';
@@ -69,9 +69,11 @@ export default function App() {
 
   return (
     <main className="main">
-      <h4>
-        Edit <code>src/App.tsx</code> and save to reload
-      </h4>
+      <div className="app-header">
+        <Typography.Title heading={5} style={{ margin: 0, fontWeight: 600 }}>
+          Project-Task Booster
+        </Typography.Title>
+      </div>
       
       <TaskList
         projectName={projectName}

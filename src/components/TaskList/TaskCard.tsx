@@ -18,6 +18,11 @@ export const TaskCard = ({ task, locale = 'en', t = (key) => key, onClickTask, s
     }
   };
 
+  const isUrl = (s?: string) => {
+    if (!s) return false;
+    try { new URL(s); return true; } catch { return false; }
+  };
+
   const visibleAssignees = task.assignees.slice(0, 3);
   const remainingCount = task.assignees.length - 3;
   const assigneeNames = task.assignees.map(a => a.name).join(locale === 'zh' ? '、' : ', ');
@@ -32,7 +37,21 @@ export const TaskCard = ({ task, locale = 'en', t = (key) => key, onClickTask, s
       aria-label={`${t('task')}: ${task.name}`}
     >
       <div className={styles['task-card-header']}>
-        <h3 className={styles['task-card-name']}>{task.name}</h3>
+        <h3 className={styles['task-card-name']}>
+          {isUrl(task.name) ? (
+            <a
+              href={task.name}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => { e.stopPropagation(); }}
+              style={{ color: '#3370ff' }}
+            >
+              {task.name}
+            </a>
+          ) : (
+            task.name
+          )}
+        </h3>
         <div className={styles['task-card-status']}>
           <Select value={task.status} onChange={(v) => onUpdateStatus && onUpdateStatus(task.id, String(v))} style={{ minWidth: 140 }}>
             {statusOptions.length === 0 ? (
