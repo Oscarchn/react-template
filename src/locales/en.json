@@ -1,3 +1,15 @@
 {
-  "title":"这是英文标题"
+  "title": "Task List",
+  "refresh": "Refresh",
+  "filter.all": "All Status",
+  "filter.placeholder": "Filter by status",
+  "empty.title": "No tasks found",
+  "empty.description": "There are no tasks associated with this project yet.",
+  "task": "Task",
+  "status": "Status",
+  "status.todo": "Todo",
+  "status.doing": "Doing",
+  "status.done": "Done",
+  "status.blocked": "Blocked",
+  "status.on_hold": "On Hold"
 }
