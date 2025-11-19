@@ -8,8 +8,5 @@
   "task": "Task",
   "status": "Status",
   "status.todo": "Todo",
-  "status.doing": "Doing",
-  "status.done": "Done",
-  "status.blocked": "Blocked",
-  "status.on_hold": "On Hold"
+  "status.done": "Done"
 }

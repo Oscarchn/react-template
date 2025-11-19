@@ -15,7 +15,7 @@ export default function App() {
   const [projectName, setProjectName] = useState<string>('Project');
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeStatusFilter, setActiveStatusFilter] = useState<string | null>(null);
+  const [activeStatusFilter, setActiveStatusFilter] = useState<'todo' | 'done' | null>(null);
   const [statusOptions, setStatusOptions] = useState<StatusOption[]>([]);
   const { t, i18n } = useTranslation();
   const [tasksTableId, setTasksTableId] = useState<string | undefined>(undefined);
@@ -44,8 +44,7 @@ export default function App() {
         setTasksTableId(link.tableId);
         console.log('task_list_len', list.length);
         setTasks(list);
-        const observed = Array.from(new Set(list.map(x => x.status)));
-        const all = Array.from(new Set([...DEFAULT_ALL_STATUSES, ...observed]));
+        const all = DEFAULT_ALL_STATUSES;
         setStatusOptions(all.map(v => ({ value: v, label: t(`status.${v}`) })));
       }
     } finally {
@@ -85,7 +84,7 @@ export default function App() {
         onChangeStatusFilter={setActiveStatusFilter}
         locale={i18n.language === 'zh' ? 'zh' : 'en'}
         t={t}
-        onUpdateStatus={async (id, status) => {
+        onUpdateStatus={async (id: string, status: 'todo' | 'done') => {
           const ok = await updateTaskStatus(id, status, tasksTableId);
           if (ok) {
             setTasks(prev => prev.map(item => item.id === id ? { ...item, status } : item));

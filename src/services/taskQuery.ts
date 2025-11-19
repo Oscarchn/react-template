@@ -216,7 +216,7 @@ export async function loadTasksByRecordIds(taskRecordIds: string[], tableId?: st
       const task: Task = {
         id: rid,
         name: parseTextCellValue(nameVal) || rid,
-        status: parseTextCellValue(statusVal) || 'todo',
+        status: sanitizeStatus(statusVal),
         assignees: parseUserCellValue(userVal),
       };
       taskCache.set(rid, task);
@@ -247,11 +247,16 @@ function normalizeLinkValue(val: any): { recordIds: string[]; tableId?: string }
   return { recordIds: [] };
 }
 
-export async function updateTaskStatus(recordId: string, status: string, tableId?: string): Promise<boolean> {
+export async function updateTaskStatus(recordId: string, status: 'todo' | 'done', tableId?: string): Promise<boolean> {
   try {
     const taskTable = tableId ? await bitable.base.getTableById(tableId) : await getTaskTable();
     const statusField = await resolveFieldByNames(taskTable, [TASK_STATUS_FIELD_NAME]);
     const cell = await statusField.getCell(recordId);
+    if (!(ALLOWED_STATUSES as string[]).includes(String(status))) return false;
+    const current = sanitizeStatus(await cell.getValue?.());
+    if (current === 'done' && status === 'todo') {
+      return false;
+    }
     await cell.setValue(status);
     return true;
   } catch (e) {
@@ -283,4 +288,10 @@ async function resolveFieldByNames(table: any, names: string[]): Promise<any | n
   }
   console.log('resolve_field_failed', names);
   return null;
+}
+const ALLOWED_STATUSES: Array<'todo' | 'done'> = ['todo', 'done'];
+
+function sanitizeStatus(val: any): 'todo' | 'done' {
+  const s = String(parseTextCellValue(val) || '').toLowerCase();
+  return (ALLOWED_STATUSES as string[]).includes(s) ? (s as 'todo' | 'done') : 'todo';
 }

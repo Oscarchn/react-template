@@ -7,12 +7,13 @@ export interface Assignee {
 export interface Task {
   id: string;
   name: string;
-  status: string;
+  statu
+  status: 'todo' | 'done';
   assignees: Assignee[];
 }
 
 export interface StatusOption {
-  value: string;
+  value: 'todo' | 'done';
   label: string;
   color?: string;
 }
@@ -35,7 +36,7 @@ export interface TaskCardProps {
   t?: (key: string) => string;
   onClickTask?: (id: string) => void;
   statusOptions?: StatusOption[];
-  onUpdateStatus?: (id: string, status: string) => void;
+  onUpdateStatus?: (id: string, status: 'todo' | 'done') => void;
 }
 
 export interface EmptyStateProps {
@@ -49,12 +50,9 @@ export interface SkeletonListProps {
   count?: number;
 }
 
-export const DEFAULT_STATUS_MAP: Record<string, string> = {
+export const DEFAULT_STATUS_MAP: Record<'todo' | 'done', string> = {
   todo: '#9397a1',
-  doing: '#3370ff',
   done: '#00b42a',
-  blocked: '#f53f3f',
-  on_hold: '#ff7d00',
 };
 
-export const DEFAULT_ALL_STATUSES: string[] = ['todo', 'doing', 'done', 'blocked', 'on_hold'];
+export const DEFAULT_ALL_STATUSES: Array<'todo' | 'done'> = ['todo', 'done'];

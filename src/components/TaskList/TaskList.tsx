@@ -1,10 +1,13 @@
 import { useMemo } from 'react';
-import { Button, Select, Badge } from '@douyinfe/semi-ui';
+import { Button, Select, Badge, Space, Typography } from '@douyinfe/semi-ui';
+import { IconRefresh, IconFilter } from '@douyinfe/semi-icons';
 import { TaskListProps } from './types';
 import { TaskCard } from './TaskCard';
 import { EmptyState } from './EmptyState';
 import { SkeletonList } from './SkeletonList';
 import styles from './TaskList.module.css';
+
+const { Title } = Typography;
 
 const defaultT = (key: string): string => {
   const dict: Record<string, string> = {
@@ -41,29 +44,45 @@ export const TaskList = ({
   return (
     <div className={styles['task-list-container']}>
       <div className={styles['task-header']}>
-        <div className={styles['task-header-top']}>
-          <div className={styles['task-header-title']}>
-            <h3 className={styles['task-project-name']}>{projectName}</h3>
-            <Badge count={filteredTasks.length} className={styles['task-count-badge']} />
-          </div>
-          <div className={styles['task-header-actions']}>
-            {statusOptions.length > 0 && (
-              <Select
-                value={activeStatusFilter || 'all'}
-                onChange={(v) => handleStatusChange(String(v))}
-                className={styles['task-filter']}
-              >
-                <Select.Option value={'all'}>{t('filter.all')}</Select.Option>
-                {statusOptions.map(opt => (
-                  <Select.Option key={opt.value} value={opt.value}>{opt.label}</Select.Option>
-                ))}
-              </Select>
-            )}
-            {onRefresh && (
-              <Button onClick={onRefresh} disabled={loading}>{t('refresh')}</Button>
-            )}
-          </div>
+        <div className={styles['header-title-section']}>
+          <Title heading={5} style={{ margin: 0 }}>
+            {projectName}
+          </Title>
+          <Badge 
+            count={filteredTasks.length} 
+            type="primary"
+          />
         </div>
+        
+        <Space spacing="tight">
+          {statusOptions.length > 0 && (
+            <Select
+              prefix={<IconFilter />}
+              value={activeStatusFilter || 'all'}
+              onChange={(v) => handleStatusChange(String(v))}
+              placeholder={t('filter.all')}
+              style={{ width: 160 }}
+              showClear
+              size="small"
+            >
+              <Select.Option value={'all'}>{t('filter.all')}</Select.Option>
+              {statusOptions.map(opt => (
+                <Select.Option key={opt.value} value={opt.value}>{opt.label}</Select.Option>
+              ))}
+            </Select>
+          )}
+          {onRefresh && (
+            <Button 
+              icon={<IconRefresh />}
+              onClick={onRefresh}
+              loading={loading}
+              type="tertiary"
+              size="small"
+            >
+              {t('refresh')}
+            </Button>
+          )}
+        </Space>
       </div>
 
       {loading ? (

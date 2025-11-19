@@ -8,8 +8,5 @@
   "task": "任务",
   "status": "状态",
   "status.todo": "待办",
-  "status.doing": "进行中",
-  "status.done": "已完成",
-  "status.blocked": "阻塞",
-  "status.on_hold": "暂挂"
+  "status.done": "已完成"
 }

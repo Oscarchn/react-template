@@ -1,10 +1,23 @@
-import { Tag, Avatar, Select } from '@douyinfe/semi-ui';
+import { Card, Tag, Avatar, Select, Typography, Tooltip } from '@douyinfe/semi-ui';
+import { IconUser } from '@douyinfe/semi-icons';
 import { TaskCardProps, DEFAULT_STATUS_MAP } from './types';
 import styles from './TaskList.module.css';
 
+const { Paragraph } = Typography;
+
 export const TaskCard = ({ task, locale = 'en', t = (key) => key, onClickTask, statusOptions = [], onUpdateStatus }: TaskCardProps) => {
-  const getStatusColor = (status: string): string => {
-    return DEFAULT_STATUS_MAP[status.toLowerCase()] || DEFAULT_STATUS_MAP.todo;
+  const getStatusColor = (status: string) => {
+    const map: Record<string, string> = {
+      '未开始': 'grey',
+      '进行中': 'blue',
+      '已完成': 'green',
+      '已阻塞': 'red',
+      'Not Started': 'grey',
+      'In Progress': 'blue',
+      'Completed': 'green',
+      'Blocked': 'red',
+    };
+    return map[status] || 'grey';
   };
 
   const handleClick = () => {
@@ -18,76 +31,87 @@ export const TaskCard = ({ task, locale = 'en', t = (key) => key, onClickTask, s
     }
   };
 
-  const isUrl = (s?: string) => {
-    if (!s) return false;
-    try { new URL(s); return true; } catch { return false; }
-  };
-
-  const visibleAssignees = task.assignees.slice(0, 3);
-  const remainingCount = task.assignees.length - 3;
-  const assigneeNames = task.assignees.map(a => a.name).join(locale === 'zh' ? '、' : ', ');
-
   return (
-    <div
+    <Card
       className={`${styles['task-card']} ${styles['fade-in']}`}
+      bordered={false}
+      shadows="hover"
       onClick={handleClick}
-      onKeyDown={handleKeyDown}
-      role="button"
-      tabIndex={0}
-      aria-label={`${t('task')}: ${task.name}`}
+      style={{
+        cursor: 'pointer',
+        transition: 'all var(--transition-base)',
+      }}
+      bodyStyle={{ padding: 'var(--space-lg)' }}
     >
-      <div className={styles['task-card-header']}>
-        <h3 className={styles['task-card-name']}>
-          {isUrl(task.name) ? (
-            <a
-              href={task.name}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => { e.stopPropagation(); }}
-              style={{ color: '#3370ff' }}
-            >
-              {task.name}
-            </a>
-          ) : (
-            task.name
-          )}
-        </h3>
-        <div className={styles['task-card-status']}>
-          <Select value={task.status} onChange={(v) => onUpdateStatus && onUpdateStatus(task.id, String(v))} style={{ minWidth: 140 }}>
-            {statusOptions.length === 0 ? (
-              <Select.Option value={task.status}>{t(`status.${task.status}`)}</Select.Option>
-            ) : (
-              statusOptions.map(opt => (
-                <Select.Option key={opt.value} value={opt.value}>{opt.label}</Select.Option>
-              ))
-            )}
-          </Select>
-        </div>
-      </div>
+      {/* 任务名称 */}
+      <Paragraph 
+        strong 
+        ellipsis={{ rows: 2, showTooltip: true }}
+        style={{ 
+          fontSize: 14,
+          marginBottom: 'var(--space-md)',
+          color: 'var(--gray-9)'
+        }}
+      >
+        {task.name}
+      </Paragraph>
 
-      {task.assignees.length > 0 && (
-        <div className={styles['task-card-assignees']}>
-          <div className={styles['task-assignee-avatars']}>
-            {visibleAssignees.map((assignee, index) => (
-              <div
-                key={assignee.id}
-                className={styles['task-avatar-item']}
-                style={{ zIndex: visibleAssignees.length - index }}
+      {/* 状态和执行人 */}
+      <div className={styles['task-card-footer']}>
+        <Select
+          value={task.status}
+          onChange={(v) => onUpdateStatus && onUpdateStatus(task.id, String(v))}
+          size="small"
+          style={{ width: 120 }}
+          renderSelectedItem={(option) => (
+            <Tag 
+              color={getStatusColor(option.label)} 
+              size="small"
+              style={{ 
+                borderRadius: 'var(--radius-full)',
+                fontWeight: 500 
+              }}
+            >
+              {option.label}
+            </Tag>
+          )}
+        >
+          {statusOptions.length === 0 ? (
+            <Select.Option value={task.status}>{t(`status.${task.status}`)}</Select.Option>
+          ) : (
+            statusOptions.map(opt => (
+              <Select.Option key={opt.value} value={opt.value}>{opt.label}</Select.Option>
+            ))
+          )}
+        </Select>
+
+        {task.assignees && task.assignees.length > 0 && (
+          <Avatar.Group 
+            maxCount={3}
+            size="small"
+            style={{ marginLeft: 'auto' }}
+          >
+            {task.assignees.map((assignee, idx) => (
+              <Tooltip 
+                key={idx} 
+                content={assignee.name || assignee.en_name}
+                position="top"
               >
-                <Avatar size="small" alt={assignee.name} src={assignee.avatarUrl || undefined} color={assignee.avatarUrl ? undefined : 'blue'}>
-                  {assignee.avatarUrl ? null : assignee.name.charAt(0).toUpperCase()}
+                <Avatar 
+                  src={assignee.avatarUrl} 
+                  size="small"
+                  style={{
+                    border: '2px solid var(--gray-1)',
+                    boxShadow: 'var(--shadow-sm)'
+                  }}
+                >
+                  {assignee.name?.[0] || assignee.en_name?.[0] || <IconUser />}
                 </Avatar>
-              </div>
+              </Tooltip>
             ))}
-            {remainingCount > 0 && (
-              <div className={styles['task-avatar-item']} style={{ zIndex: 0 }}>
-                <Avatar size="small" color="grey">+{remainingCount}</Avatar>
-              </div>
-            )}
-          </div>
-          <span className={styles['task-assignee-names']} title={assigneeNames}>{assigneeNames}</span>
-        </div>
-      )}
-    </div>
+          </Avatar.Group>
+        )}
+      </div>
+    </Card>
   );
 };
